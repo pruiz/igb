@@ -234,6 +234,17 @@ IGB_PARAM(QueuePairs, "Enable Tx/Rx queue pairs for interrupt handling (0,1), de
  IGB_PARAM(LRO, "Large Receive Offload (0,1), default 0=off");
 
 #endif
+
+#if defined(NETIF_F_HW_VLAN_RX) || defined(NETIF_F_HW_VLAN_CTAG_RX)
+/* Enable/Disable VLAN hw offload
+ *
+ * Valid Values: 0(off), 1(on)
+ *
+ * Default Value: 0
+ */
+ IGB_PARAM(VHO, "Vlan Hardware Offload (0,1), default 1=on");
+#endif
+
 struct igb_opt_list {
 	int i;
 	char *str;
@@ -844,5 +855,34 @@ void igb_check_options(struct igb_adapter *adapter)
 		}
 #endif
 	}
+#if defined(NETIF_F_HW_VLAN_RX) || defined(NETIF_F_HW_VLAN_CTAG_RX)
+	{ /* VHO - Disable Vlan Hardware Offload */
+#ifdef NETIF_F_HW_VLAN_CTAG_RX
+		netdev_features_t value = NETIF_F_HW_VLAN_CTAG_RX | NETIF_F_HW_VLAN_CTAG_TX;
+#else
+		netdev_features_t value = NETIF_F_HW_VLAN_RX | NETIF_F_HW_VLAN_TX;
+#endif
+		struct igb_option opt = {
+			.type = enable_option,
+			.name = "VHO - Vlan HArdware Offload",
+			.err  = "defaulting to Enabled",
+			.def  = OPTION_ENABLED
+		};
+		struct net_device *netdev = adapter->netdev;
+#ifdef module_param_array
+		if (num_VHO > bd) {
+#endif
+			unsigned int vho = VHO[bd];
+			igb_validate_option(&vho, &opt, adapter);
+			if (vho) netdev->features |= value;
+			else netdev->features &= ~value;
+#ifdef module_param_array
+		} else {
+			if (opt.def == OPTION_ENABLED) netdev->features |= value;
+			else netdev->features &= ~value;
+		}
+#endif
+	}
+#endif /* (NETIF_F_HW_VLAN_RX || NETIF_F_HW_VLAN_CTAG_RX) */
 }
 

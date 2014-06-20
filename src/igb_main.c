@@ -2644,15 +2644,18 @@ static int __devinit igb_probe(struct pci_dev *pdev,
 #ifdef NETIF_F_RXHASH
 			    NETIF_F_RXHASH |
 #endif
-			    NETIF_F_RXCSUM |
+			    NETIF_F_RXCSUM;
+#ifdef HAVE_NDO_SET_FEATURES
 #ifdef NETIF_F_HW_VLAN_CTAG_RX
+	netdev->hw_features |=
 			    NETIF_F_HW_VLAN_CTAG_RX |
 			    NETIF_F_HW_VLAN_CTAG_TX;
 #else
+	netdev->hw_features |=
 			    NETIF_F_HW_VLAN_RX |
 			    NETIF_F_HW_VLAN_TX;
 #endif
-
+#endif
 	if (hw->mac.type >= e1000_82576)
 		netdev->features |= NETIF_F_SCTP_CSUM;
 
