@@ -858,9 +858,9 @@ void igb_check_options(struct igb_adapter *adapter)
 #if defined(NETIF_F_HW_VLAN_RX) || defined(NETIF_F_HW_VLAN_CTAG_RX)
 	{ /* VHO - Disable Vlan Hardware Offload */
 #ifdef NETIF_F_HW_VLAN_CTAG_RX
-		netdev_features_t value = NETIF_F_HW_VLAN_CTAG_RX | NETIF_F_HW_VLAN_CTAG_TX;
+		netdev_features_t value = NETIF_F_HW_VLAN_CTAG_RX | NETIF_F_HW_VLAN_CTAG_TX | NETIF_F_HW_VLAN_CTAG_FILTER;
 #else
-		netdev_features_t value = NETIF_F_HW_VLAN_RX | NETIF_F_HW_VLAN_TX;
+		netdev_features_t value = NETIF_F_HW_VLAN_RX | NETIF_F_HW_VLAN_TX | NETIF_F_HW_VLAN_FILTER;
 #endif
 		struct igb_option opt = {
 			.type = enable_option,
